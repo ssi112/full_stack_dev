@@ -10,7 +10,7 @@
 
 - [Table of Contents](#table-of-contents)
 - [Intro](#intro)
-- [Project #1](#project1)
+- [Project 1](#project1)
 - [License](#license)
 
 ## Intro
@@ -21,7 +21,7 @@ This nano-degree is designed to enable learners to build database backed APIs an
 * Secure and manage user authentication and access control for an application backend
 * Deploy a Flask-based web application to the cloud using Docker and Kubernetes
 
-## Project #1
+## Project 1
 Create a booking site Fy-yur that facilitates bookings between artists who can play at venues, and venues who want to book artists.
 
 * [Starter code](https://github.com/udacity/FSND/tree/master/projects/01_fyyur/starter_code) with overview, structure, instructions and criteria.
