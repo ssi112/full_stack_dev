@@ -16,7 +16,7 @@ Required Software
 * PIP
 * Code Editor
 * Web Browser
-
+---
 ### PostgreSQL CLI
 
 Start psql with a connection to dbname. Optionally useanother user than current user: 
@@ -64,7 +64,7 @@ Port | 5432
 Username | postgres
 Password | (None)
 
-
+---
 ### SQLAlchemy
 
 SQLAlchemy offers multiple ways of interacting with DB. 
@@ -110,4 +110,29 @@ _Can use SQLAlchemy to communicate with DB using any of the three layers of abst
 
 
 **SQL ORM** - Highest level of abstraction. Create Python classes that map to DB objects. Wraps the Expressions and Engine layer.
+
+---
+### SQLAlchemy ORM: Mapping Between Tables and Classes
+
+Can think of a DB table as a template for future rows to fill the table. Columns are attributes of the table object. Python classes are similar in that classes have attributes that can match the columns in the table.
+
+* Tables map to classes
+* Table records map to class objects
+* Table columns map to class attributes
+
+---
+Flask [documentation](https://flask.palletsprojects.com/en/1.1.x/)
+
+Flask SQLAlchemy [documentation](https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
+
+Install from command line using pip or pip3:
+`pip install flask`
+`pip install flask-sqlalchemy`
+
+**_See demos/flask_hello.py for basic usage of Flask and SQLAlchemy_**
+
+Database Connection URI Parts:
+![Database URI](md_img/database-connection-uri-parts.png  "Connection URI")
+
+
 

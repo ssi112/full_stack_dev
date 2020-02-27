@@ -3,6 +3,11 @@
 *.pyc
 
 *.ods
+.~lock.fs_course_outline*.*
+
+projects/01_fyyur/*
+projects/*.zip
+
 
 
 
