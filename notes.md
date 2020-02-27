@@ -134,5 +134,29 @@ Install from command line using pip or pip3:
 Database Connection URI Parts:
 ![Database URI](md_img/database-connection-uri-parts.png  "Connection URI")
 
+**SQLAlchemy Data Types**
+
+Type | Description
+----- | -----------------
+Integer | an integer
+String(size) | a string with a maximum length (optional in some databases, e.g. PostgreSQL)
+Text | some longer unicode text
+DateTime | date and time expressed as Python datetime object.
+Float | stores floating point values
+Boolean | stores a boolean value
+PickleType | stores a pickled Python object
+LargeBinary | stores large arbitrary binary data
+
+SQLAlchemy [Cheat Sheet](https://github.com/crazyguitar/pysheeet/blob/master/docs/notes/python-sqlalchemy.rst#set-a-database-url)
+
+**_Use this to try and fix the piece of crap example code they provide in the lesson demo as it does not work outside Udacity's environment._**
+
+* Using PostgreSQL through [SQLAlchemy](https://www.compose.com/articles/using-postgresql-through-sqlalchemy/)
+
+* Also refer to this [example](https://realpython.com/flask-by-example-part-2-postgres-sqlalchemy-and-alembic/)
+
+
+
+
 
 
