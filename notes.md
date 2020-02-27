@@ -155,6 +155,57 @@ SQLAlchemy [Cheat Sheet](https://github.com/crazyguitar/pysheeet/blob/master/doc
 
 * Also refer to this [example](https://realpython.com/flask-by-example-part-2-postgres-sqlalchemy-and-alembic/)
 
+**SQLAlchemy ORM Basics**
+
+Using table `persons` in todoapp DB
+
+create new instance of person object
+newperson = Person(id=6, name='Erasmus B. Draggin')
+db.session.add(newperson)
+db.session.commit()
+
+add multiple instances
+db.session.add_all( [class instance], [class instance] )
+
+Person.query.first()
+person = Person.query.filter_by(name='Amy').first()
+person.name
+
+results = Person.query.all()
+results
+```
+[<Person ID: 1, name: Helen Bach>, <Person ID: 2, name: Ira Kall>, <Person ID: 3, name: Xavier Breath>, <Person ID: 4, name: Ariel Bummermon>, <Person ID: 5, name: Lena Onme>, <Person ID: 6, name: Erasmus B. Draggin>]
+```
+
+
+db.Model.query offers us the Query object. The Query object lets us generate SELECT statements that let us query and return slices of data from our database.
+
+_Query has method chaining. You can chain one query method to another (indefinitely), getting back more query objects, until you chain it with a terminal method that returns a non-query object like count(), all(), first(), delete(), etc._
+
+The Query object can be accessed on a model using either:
+
+* MyModel.query directly on the model, or
+* db.session.query(MyModel) using db.session.query instead.
+
+Query Methods | SQL 
+---------------- | ---------
+all() | SELECT *
+first() | returns first object 
+filter_by() | WHERE 
+filter | specify attributes on a model
+limit(#) | LIMIT
+count() | COUNT
+get() | get object by primary key
+delete() | DELETE
+join | JOIN
+
+Common [filter](https://docs.sqlalchemy.org/en/13/orm/tutorial.html#common-filter-operators) operations
+
+Doc for the [Query API](https://docs.sqlalchemy.org/en/13/orm/query.html)
+
+
+![ORM Object Lifecycle](md_img/orm-object-lifecycle.png  "Object Lifecycle")
+
 
 
 
