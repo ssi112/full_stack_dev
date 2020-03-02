@@ -1,7 +1,8 @@
 
 .git
 *.pyc
-__pycache__
+__pycache__/
+__pycache__/*
 
 *.ods
 .~lock.fs_course_outline*.*
