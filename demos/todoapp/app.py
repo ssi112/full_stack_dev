@@ -1,3 +1,8 @@
+'''
+app.py
+Flask-Migrate: https://flask-migrate.readthedocs.io/en/latest/
+
+'''
 from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -37,7 +42,7 @@ def index():
 
 
 '''
-# original method using HTTP Post method - synchronis method
+# original method using HTTP Post method - synchronous method
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
     description = request.form.get('description', '')
@@ -45,10 +50,8 @@ def create_todo():
     db.session.add(todo)
     db.session.commit()
     return redirect(url_for('index'))
-'''
 
-'''
-new method using AJAX fetch method - asynchronis
+new method using AJAX fetch method - asynchronous
 '''
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
@@ -68,16 +71,10 @@ def create_todo():
         print(sys.exc_info())
     finally:
         db.session.close()
-    '''
-    todo = Todo(description=description)
-    db.session.add(todo)
-    db.session.commit()
-    '''
     if error:
         abort (400)
     else:
         return jsonify(saveTodoObj)
-
 
 
 '''
