@@ -3,44 +3,89 @@
     <head>
         <title>To Do App</title>
         <style>
-            .hidden { display: none; }
+            #error { display: none; }
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
         </style>
     </head>
     <body>
+        <div id="error" class="hidden">Uh oh, something went wrong!</div>
+
         <form id="form" method="post" action="/todos/create">
             <input type="text" id="description" name="description" />
             <input type="submit" value="Create To Do" />
         </form>
 
-        <div id="error" class="hidden">Uh oh, something went wrong!</div>
-
         <ul id="todos">
             {% for d in data %}
-                <li>{{ d.description }}</li>
+                <!-- bound the id of checkbox to the id of the item
+                     will need this when updating the DB -->
+                <li><input class="check-completed" type="checkbox" data-id="{{d.id}}"
+                        {% if d.completed %}
+                            checked
+                        {% endif %} />
+                    {{ d.description }}
+                </li>
             {% endfor %}
         </ul>
 
         <script type="text/javascript">
+            // loop over checkbox items and listen for on-change event
+            const checkboxes = document.querySelectorAll('.check-completed');
+            for (let i = 0; i < checkboxes.length; i++) {
+                const checkbox = checkboxes[i];
+                checkbox.onchange = function(e) {
+                    console.log('event ', e);
+                    // get data from the DOM to send to (server) controller
+                    // will be passed to the route in app.py
+                    const newCompleted = e.target.checked;
+                    const todo_id = e.target.dataset['id']
+                    fetch('/todos/' + todo_id + 'set-completed', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'completed': newCompleted
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(function() {
+                        document.getElementById('error').className='hidden';
+                    })
+                    .catch(function() {
+                    // remove hidden attribute if error
+                    document.getElementById('error').className='';
+                });
+                }
+            }
+
+            // input of new to do item
+            const descInput = document.getElementById('description');
             document.getElementById('form').onsubmit=function(e) {
                 // prevent full page refresh, submit
                 e.preventDefault();
+                const desc = descInput.value;
+                descInput.value = '';
                 // promised based library
                 fetch('/todos/create', {
                     method: 'POST',
                     body: JSON.stringify({
-                        'description': document.getElementById('description').value
+                        'description': desc
                     }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 })
-                .then(function(response) { // parse the json response
-                    return response.json();
-                })
-                .then(function(jsonResponse) {  // take parsed response and append
-                    console.log(jsonResponse);
-                    const li = document.createElement('li');
-                    li.innerHTML = jsonResponse['description'];
+                // parse the json response
+                .then(response => response.json())
+                // take parsed response and append
+                .then(jsonResponse => {
+                    console.log('response', jsonResponse);
+                    li = document.createElement('li');
+                    li.innerText = desc;
                     document.getElementById('todos').appendChild(li);
                     // add hidden attribute on good response
                     document.getElementById('error').className='hidden';

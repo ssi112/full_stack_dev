@@ -38,7 +38,7 @@ db.create_all()
 
 @app.route('/')
 def index():
-    return render_template('index.html', data=Todo.query.order_by(Todo.id))
+    return render_template('index.html', data=Todo.query.order_by(Todo.id).all())
 
 
 '''
@@ -76,6 +76,21 @@ def create_todo():
     else:
         return jsonify(saveTodoObj)
 
+
+# <todo_id> id of item having completed state changed
+# set in the view (index.html)
+@app.route('/todos/<todo_id>set-completed', methods=['POST'])
+def set_completed_todo(todo_id):
+    try:
+        completed = request.get_json()['completed']
+        todo = Todo.query.get(todo_id)
+        todo.completed = completed
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('index'))
 
 '''
 When we call a script this way, using $ python script.py, the script's
