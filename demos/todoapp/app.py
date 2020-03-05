@@ -60,9 +60,12 @@ def create_todo():
     try:
         # get the json response object from fetch
         description = request.get_json()['description']
-        todo = Todo(description=description)
+        todo = Todo(description=description, completed=False)
         db.session.add(todo)
         db.session.commit()
+        # need all attributes to update list in HTML view
+        saveTodoObj['id'] = todo.id
+        saveTodoObj['completed'] = todo.completed
         saveTodoObj['description'] = todo.description
     except:
         db.session.rollback()
@@ -91,6 +94,23 @@ def set_completed_todo(todo_id):
     finally:
         db.session.close()
     return redirect(url_for('index'))
+
+
+# <delete_id> id of item that should be deleted
+# set in the view (index.html)
+@app.route('/todos/<delete_id>delete-item', methods=['DELETE'])
+def delete_todo_item(delete_id):
+    # print("delete_id =",delete_id)
+    try:
+        todo = Todo.query.get(delete_id)
+        db.session.delete(todo)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return jsonify({ 'success': True })
+
 
 '''
 When we call a script this way, using $ python script.py, the script's

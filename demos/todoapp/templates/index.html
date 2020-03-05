@@ -8,26 +8,38 @@
                 list-style: none;
                 padding: 0;
                 margin: 0;
+                width: 450px;
+            }
+            li {
+                clear: both;
+            }
+            li button {
+                -webkit-appearance: none;
+                border: none;
+                outline: none;
+                color: red;
+                float: right;
+                font-size: 20px;
             }
         </style>
     </head>
     <body>
         <div id="error" class="hidden">Uh oh, something went wrong!</div>
-
         <form id="form" method="post" action="/todos/create">
             <input type="text" id="description" name="description" />
             <input type="submit" value="Create To Do" />
         </form>
 
         <ul id="todos">
+            <!-- bind the id of checkbox & delete button to the id of the item
+                 of the item for updating the DB -->
             {% for d in data %}
-                <!-- bound the id of checkbox to the id of the item
-                     will need this when updating the DB -->
                 <li><input class="check-completed" type="checkbox" data-id="{{d.id}}"
                         {% if d.completed %}
                             checked
                         {% endif %} />
                     {{ d.description }}
+                    <button class="delete-button" data-id="{{d.id}}">&cross;</button>
                 </li>
             {% endfor %}
         </ul>
@@ -56,9 +68,32 @@
                         document.getElementById('error').className='hidden';
                     })
                     .catch(function() {
-                    // remove hidden attribute if error
-                    document.getElementById('error').className='';
-                });
+                        // remove hidden attribute if error
+                        document.getElementById('error').className='';
+                    });
+                }
+            }
+
+            // loop over delete buttons and listen for an on-change event
+            const deletebuttons = document.querySelectorAll('.delete-button');
+            for (let i = 0; i < deletebuttons.length; i++) {
+                const deletebutton = deletebuttons[i];
+                deletebutton.onclick = function(e) {
+                    console.log('event ', e);
+                    // get data from the DOM to send to (server) controller
+                    // will be passed to the route in app.py
+                    const deleteThisItem = e.target.click;
+                    const delete_id = e.target.dataset['id']
+                    console.log("delete_id =", delete_id)
+
+                    fetch('/todos/' + delete_id + 'delete-item', {
+                        method: 'DELETE'
+                    })
+                    // remove item from the list
+                    .then(function(){
+                        const item = e.target.parentElement;
+                        item.remove();
+                    });
                 }
             }
 
@@ -83,9 +118,26 @@
                 .then(response => response.json())
                 // take parsed response and append
                 .then(jsonResponse => {
+                    // need the id to add the completed checkbox and delete button
                     console.log('response', jsonResponse);
-                    li = document.createElement('li');
-                    li.innerText = desc;
+
+                    const li = document.createElement('li');
+
+                    const ckbox = document.createElement('input');
+                    ckbox.className = 'check-completed';
+                    ckbox.type = 'checkbox';
+                    ckbox.setAttribute('data-id', jsonResponse.id);
+                    li.appendChild(ckbox);
+
+                    const text = document.createTextNode(' ' + jsonResponse.description);
+                    li.appendChild(text);
+
+                    const delbutton = document.createElement('button');
+                    delbutton.className = "delete-button";
+                    delbutton.setAttribute('data-id', jsonResponse.id)
+                    delbutton.innerHTML = "&cross;";
+                    li.appendChild(delbutton)
+
                     document.getElementById('todos').appendChild(li);
                     // add hidden attribute on good response
                     document.getElementById('error').className='hidden';
