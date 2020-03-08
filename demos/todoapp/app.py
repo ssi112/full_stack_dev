@@ -28,26 +28,44 @@ class Todo(db.Model):
     __table_args__ = {"schema": "public"}
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
-    completed = db.Column(db.Boolean, nullable=True, default=False)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
     # relation to child table
     list_id = db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
     def __repr__(self):
         return f'<Todo ID: {self.id}, description: {self.description}>'
 
+
 class TodoList(db.Model):
     __tablename__ = 'todolists'
-    __table_args__ = {"schema": "public"}
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # THROWS ERROR IF INCLUDED:
+    # sqlalchemy.exc.NoReferencedTableError: Foreign key associated with column
+    # 'todos.list_id' could not find table 'todolists' with which to generate a
+    # foreign key to target column 'id'
+    ### __table_args__ = {"schema": "public"}
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     todos = db.relationship('Todo', backref='list', lazy=True)
+    def __repr__(self):
+        return f'<TodoList {self.id} {self.name}>'
+
 
 # if not exist this will create the tables
 db.create_all()
 
+
+@app.route('/lists/<list_id>')
+def get_todo_lists(list_id):
+    return render_template('index.html',
+        lists = TodoList.query.all(),
+        active_list = TodoList.query.get(list_id),
+        todos = Todo.query.filter_by(list_id=list_id).order_by('id').all())
+
+
 @app.route('/')
 def index():
-    return render_template('index.html', data=Todo.query.order_by(Todo.id).all())
-
+    return redirect(url_for('get_todo_lists', list_id=1))
 
 '''
 # original method using HTTP Post method - synchronous method
@@ -60,6 +78,9 @@ def create_todo():
     return redirect(url_for('index'))
 
 new method using AJAX fetch method - asynchronous
+
+CHECK THIS FOR SOLUTION TO INCLUDE LIST ID
+https://github.com/sabinevidal/todoapp/blob/master/app.py
 '''
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
@@ -68,7 +89,7 @@ def create_todo():
     try:
         # get the json response object from fetch
         description = request.get_json()['description']
-        todo = Todo(description=description, completed=False)
+        todo = Todo(description=description, completed=False, list_id=)
         db.session.add(todo)
         db.session.commit()
         # need all attributes to update list in HTML view
