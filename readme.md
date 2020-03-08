@@ -21,6 +21,15 @@ This nano-degree is designed to enable learners to build database backed APIs an
 * Secure and manage user authentication and access control for an application backend
 * Deploy a Flask-based web application to the cloud using Docker and Kubernetes
 
+#### Migrations
+
+* `flask db init` setup migrations for the app
+* `dropdb todoapp -p 5433` drop the db (so flask-migrate can be aware of it)
+* `createdb todoapp -p 5433` create db
+* `flask db migrate` migrate the db
+* `flask db upgrade` run upgrade
+* `flask db downgrade` rollback upgrade
+
 ## Project 1 <a name="project1"></a>
 Create a booking site Fy-yur that facilitates bookings between artists who can play at venues, and venues who want to book artists.
 
