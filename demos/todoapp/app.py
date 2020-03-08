@@ -57,6 +57,8 @@ db.create_all()
 
 @app.route('/lists/<list_id>')
 def get_todo_lists(list_id):
+    print("list_id =", list_id)
+    list_id = int(list_id)
     return render_template('index.html',
         lists = TodoList.query.all(),
         active_list = TodoList.query.get(list_id),
@@ -80,7 +82,8 @@ def create_todo():
 new method using AJAX fetch method - asynchronous
 
 CHECK THIS FOR SOLUTION TO INCLUDE LIST ID
-https://github.com/sabinevidal/todoapp/blob/master/app.py
+https://github.com/varlese/todo-project/blob/master/app.py
+https://github.com/varlese/todo-project/blob/master/Templates/index.html
 '''
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
@@ -89,7 +92,8 @@ def create_todo():
     try:
         # get the json response object from fetch
         description = request.get_json()['description']
-        todo = Todo(description=description, completed=False, list_id=)
+        list_id = request.get_json()['list_id']
+        todo = Todo(description=description, completed=False, list_id=list_id)
         db.session.add(todo)
         db.session.commit()
         # need all attributes to update list in HTML view
