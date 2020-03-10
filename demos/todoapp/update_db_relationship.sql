@@ -34,8 +34,8 @@ VALUES(4, 'Eat veggies', FALSE, 2);
 
 SELECT * FROM public.todolists;
 
-SELECT t.id, description, completed, list_id, l.name
+SELECT t.id, description, completed, list_id, l.id, l.name
 FROM public.todos t
-INNER JOIN public.todolists l
+RIGHT JOIN public.todolists l
 ON t.list_id = l.id
-ORDER BY id;
+ORDER BY l.id, t.id

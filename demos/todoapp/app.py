@@ -5,6 +5,7 @@ Flask-Migrate: https://flask-migrate.readthedocs.io/en/latest/
 '''
 from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 from flask_migrate import Migrate
 import sys
 
@@ -55,6 +56,15 @@ class TodoList(db.Model):
 db.create_all()
 
 
+# ----------------------------------------------------------------------
+# home
+@app.route('/')
+def index():
+    return redirect(url_for('get_todo_lists', list_id=1))
+
+
+# ----------------------------------------------------------------------
+# get the to do category lists
 @app.route('/lists/<list_id>')
 def get_todo_lists(list_id):
     print("list_id =", list_id)
@@ -65,20 +75,42 @@ def get_todo_lists(list_id):
         todos = Todo.query.filter_by(list_id=list_id).order_by('id').all())
 
 
-@app.route('/')
-def index():
-    return redirect(url_for('get_todo_lists', list_id=1))
+# ----------------------------------------------------------------------
+# create a new to do category list for grouping items
+@app.route('/create-list', methods=['POST'])
+def create_list():
+    error = False
+    body = {}
+    try:
+        # need the last todolists id in order to avoid duplicate
+        # index error
+        #last_list = TodoList.query.with_entities(TodoList.id).order_by(desc('id')).limit(1).all()
+        #last_list_id = TodoList.query.get(id)
+        #print("\n >>> last_list_id={} {}\n".format(last_list))
+
+        name = request.get_json()['name']
+        #new_list = TodoList(id=last_list_id, name=name)
+        new_list = TodoList(name=name)
+        db.session.add(new_list)
+        db.session.commit()
+        body['name'] = new_list.name
+        body['id'] = new_list.id
+    except:
+        error = True
+        db.session.rollback()
+        print("*"*55)
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if not error:
+        return jsonify(body)
+    else:
+        abort(500)
 
 '''
-# original method using HTTP Post method - synchronous method
-@app.route('/todos/create', methods=['POST'])
-def create_todo():
-    description = request.form.get('description', '')
-    todo = Todo(description=description)
-    db.session.add(todo)
-    db.session.commit()
-    return redirect(url_for('index'))
-
+------------------------------------------------------------------------
+create a new to do item
+original method using HTTP Post method - synchronous method
 new method using AJAX fetch method - asynchronous
 
 CHECK THIS FOR SOLUTION TO INCLUDE LIST ID
@@ -113,6 +145,8 @@ def create_todo():
         return jsonify(saveTodoObj)
 
 
+# ----------------------------------------------------------------------
+# mark a to do item as completed
 # <todo_id> id of item having completed state changed
 # set in the view (index.html)
 @app.route('/todos/<todo_id>set-completed', methods=['POST'])
@@ -129,6 +163,8 @@ def set_completed_todo(todo_id):
     return redirect(url_for('index'))
 
 
+# ----------------------------------------------------------------------
+# delete a to do item
 # <delete_id> id of item that should be deleted
 # set in the view (index.html)
 @app.route('/todos/<delete_id>delete-item', methods=['DELETE'])
@@ -146,6 +182,7 @@ def delete_todo_item(delete_id):
 
 
 '''
+------------------------------------------------------------------------
 When we call a script this way, using $ python script.py, the script's
 __name__ gets set to __main__ by the Python interpreter, which then runs
 through all code found in the script. When it reaches the end, and
@@ -154,7 +191,5 @@ calls app.run() at the end, running the Flask app.
 '''
 if __name__ == "__main__":
     app.run(debug=True)
-
-#********************************************************************
 
 
