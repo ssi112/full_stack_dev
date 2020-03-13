@@ -46,6 +46,9 @@ class Venue(db.Model):
     seeking_talent = db.Column(BOOLEAN, default=False)
     seeking_description = db.Column(db.String(120), nullable=True)
     #shows = db.relationship('Show', backref='venues', lazy=True)
+    #---
+    artists = db.relationship("Show", backref=db.backref("venues_to_artists",
+      cascade="all, delete-orphan", lazy="joined"))
 
     def __repr__(self):
         return f'<Venue {self.id} {self.name}>'
@@ -64,8 +67,10 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(BOOLEAN, default=False)
     seeking_description = db.Column(db.String(120), nullable=True)
-    #shows = db.relationship('Show', backref='Artist', lazy=True)
-
+    #shows = db.relationship('Show', backref='artists', lazy=True)
+    #---
+    venues = db.relationship("Show", backref=db.backref('artists_to_venues',
+      cascade="all, delete-orphan", lazy='joined'))
     def __repr__(self):
         return f'<Artist {self.id} {self.name}>'
 
@@ -80,6 +85,9 @@ class Show(db.Model):
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    #---
+    #artists = db.relationship("Artist", back_populates="venues", cascade="all", lazy='dynamic')
+    #venues = db.relationship("Venue", back_populates="artists", lazy='joined')
 
     def __repr__(self):
         return f'<Show {self.id}, Artist {self.artist_id}, Venue {self.venue_id}>'
