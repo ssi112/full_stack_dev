@@ -32,78 +32,16 @@ migrate = Migrate(app, db)
 # TODO Implement Venue, Artist & Show models, and complete all model
 # relationships and properties, as a database migration.
 #----------------------------------------------------------------------------#
-'''
-class Venue(db.Model):
-    __tablename__ = 'venues'
-    #__table_args__ = {"schema": "public"}
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    seeking_talent = db.Column(BOOLEAN, default=False)
-    seeking_description = db.Column(db.String(120), nullable=True)
-    #shows = db.relationship('Show', backref='venues', lazy=True)
-    #---
-    # CHECK Association Object docs
-    # https://docs.sqlalchemy.org/en/13/orm/basic_relationships.html#many-to-many
-    #---
-    artists = db.relationship("Show", backref=db.backref("venues_to_artists",
-      cascade="all,delete", lazy="joined"))
-
-    def __repr__(self):
-        return f'<Venue {self.id} {self.name}>'
-
-
-class Artist(db.Model):
-    __tablename__ = 'artists'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    #genres = db.Column(db.String(120))
-    genres = db.Column(ARRAY(db.String))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    seeking_venue = db.Column(BOOLEAN, default=False)
-    seeking_description = db.Column(db.String(120), nullable=True)
-    #shows = db.relationship('Show', backref='artists', lazy=True)
-    #---
-    venues = db.relationship("Show", backref=db.backref('artists_to_venues',
-      cascade="all,delete", lazy='joined'))
-    def __repr__(self):
-        return f'<Artist {self.id} {self.name}>'
-
-
-class Show(db.Model):
-    """
-    Linking table between Venue & Artist to support many-to-many
-    relationship.
-    """
-    __tablename__ = 'shows'
-    id = db.Column(db.Integer, primary_key=True)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    #---
-    #artists = db.relationship("Artist", back_populates="venues", cascade="all", lazy='dynamic')
-    #venues = db.relationship("Venue", back_populates="artists", lazy='joined')
-
-    def __repr__(self):
-        return f'<Show {self.id}, Artist {self.artist_id}, Venue {self.venue_id}>'
-'''
 class Show(db.Model):
     __tablename__ = 'shows'
     id = db.Column(db.Integer, primary_key=True)
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    artist = db.relationship("Artist", back_populates="parents", cascade="all")
-    venue = db.relationship("Venue", back_populates="children", cascade="all")
+    artist = db.relationship("Artist", back_populates="parents",
+      cascade="all", lazy="joined")
+    venue = db.relationship("Venue", back_populates="children",
+      cascade="all", lazy="joined")
 
     def __repr__(self):
         return f'<Show {self.id}, Artist {self.artist_id}, Venue {self.venue_id}>'
@@ -200,7 +138,16 @@ def venues():
     }]
   }]
   '''
-  data = Venue.query.order_by(Venue.city).all()
+  data = Venue.query.order_by(Venue.city, Venue.name).all()
+  '''
+  getting the count of upcoming shows
+  7:00 mark => https://www.youtube.com/watch?v=iDrs1S_ySg4
+  https://stackoverflow.com/questions/1052148/group-by-count-function-in-sqlalchemy
+
+  upcoming_shows = db.session.query(Artist, Venue, Shows).join(Shows, Shows.artist_id ==Artist.artist_id).
+         join(Venue,Venue.venue_id==Shows.venue_id).
+         filter(Shows.start_time > datetime.today(),Venue.venue_id ==venueId)
+  '''
   return render_template('pages/venues.html', areas=data);
 
 

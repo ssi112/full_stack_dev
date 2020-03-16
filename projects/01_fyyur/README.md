@@ -29,7 +29,7 @@ Our tech stack will include:
 
 ### Main Files: Project Structure
 
-  ```sh
+```sh
   ├── README.md
   ├── app.py *** the main driver of the app. Includes your SQLAlchemy models.
                     "python app.py" to run after installing dependences
@@ -48,7 +48,7 @@ Our tech stack will include:
       ├── forms
       ├── layouts
       └── pages
-  ```
+```
 
 Overall:
 * Models are located in the `MODELS` section of `app.py`.
